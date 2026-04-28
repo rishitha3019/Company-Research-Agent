@@ -34,6 +34,19 @@ section[data-testid="stSidebar"] * { color: #1a1a1a !important; }
 [data-testid="stChatMessage"] code { background-color: #EAF3DE !important; color: #3B6D11 !important; padding: 2px 6px !important; border-radius: 4px !important; }
 .stChatInput textarea { background-color: #ffffff !important; color: #1a1a1a !important; border: 1px solid #c8e6c8 !important; border-radius: 12px !important; font-size: 14px !important; }
 .stButton button { background-color: #1D9E75 !important; color: white !important; border: none !important; border-radius: 8px !important; font-size: 13px !important; font-weight: 500 !important; }
+
+[data-testid="stChatMessageAvatarUser"] {
+    background-color: #1D9E75 !important;
+    color: white !important;
+}
+[data-testid="stChatMessageAvatarAssistant"] {
+    background-color: #EAF3DE !important;
+    color: #3B6D11 !important;
+}
+[data-testid="stChatMessageAvatarUser"] img,
+[data-testid="stChatMessageAvatarAssistant"] img {
+    display: none !important;
+}
 </style>
 """, unsafe_allow_html=True)
 

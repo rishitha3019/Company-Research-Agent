@@ -2,7 +2,7 @@ import os
 import streamlit as st
 from anthropic import Anthropic
 
-st.set_page_config(page_title="Company Research Agent", page_icon="🔍", layout="wide")
+st.set_page_config(page_title="Company Research Agent", page_icon="🔍", layout="wide", initial_sidebar_state="expanded")
 
 client = Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
 

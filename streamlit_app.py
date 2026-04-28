@@ -47,6 +47,12 @@ section[data-testid="stSidebar"] * { color: #1a1a1a !important; }
 [data-testid="stChatMessageAvatarAssistant"] img {
     display: none !important;
 }
+
+[data-testid="collapsedControl"] {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
 </style>
 """, unsafe_allow_html=True)
 

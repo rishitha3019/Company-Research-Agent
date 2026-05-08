@@ -5,8 +5,7 @@ from anthropic import Anthropic
 st.set_page_config(
     page_title="Company Research Agent",
     page_icon="🔍",
-    layout="wide",
-    initial_sidebar_state="expanded"
+    layout="centered"
 )
 
 client = Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
@@ -30,13 +29,6 @@ st.markdown("""
 html, body, [class*="css"] { font-family: 'Inter', sans-serif !important; }
 #MainMenu, footer, header { visibility: hidden; }
 .stApp { background-color: #f8faf8 !important; }
-section[data-testid="stSidebar"] {
-    background-color: #ffffff !important;
-    border-right: 1px solid #e8f0e8 !important;
-    min-width: 220px !important;
-    max-width: 280px !important;
-}
-section[data-testid="stSidebar"] * { color: #1a1a1a !important; }
 [data-testid="stChatMessage"] {
     background-color: #ffffff !important;
     border: 1px solid #e8f0e8 !important;
@@ -52,53 +44,52 @@ section[data-testid="stSidebar"] * { color: #1a1a1a !important; }
 [data-testid="stChatMessage"] code { background-color: #EAF3DE !important; color: #3B6D11 !important; padding: 2px 6px !important; border-radius: 4px !important; }
 .stChatInput textarea { background-color: #ffffff !important; color: #1a1a1a !important; border: 1px solid #c8e6c8 !important; border-radius: 12px !important; font-size: 14px !important; }
 .stButton button { background-color: #1D9E75 !important; color: white !important; border: none !important; border-radius: 8px !important; font-size: 13px !important; font-weight: 500 !important; }
+.chip { display: inline-block; background: #EAF3DE; color: #3B6D11; font-size: 12px; padding: 4px 12px; border-radius: 20px; margin: 3px; cursor: pointer; }
 </style>
 """, unsafe_allow_html=True)
 
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-if "history" not in st.session_state:
-    st.session_state.history = []
+# Header
+st.markdown("""
+<div style='text-align:center;padding:32px 0 8px;'>
+    <div style='display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:6px;'>
+        <div style='width:10px;height:10px;border-radius:50%;background:#1D9E75;'></div>
+        <span style='font-size:26px;font-weight:600;color:#1a1a1a;letter-spacing:-0.4px;'>Company Research Agent</span>
+    </div>
+    <div style='font-size:14px;color:#6b7c6b;'>Powered by Claude + Web Search</div>
+</div>
+""", unsafe_allow_html=True)
 
-with st.sidebar:
+# Show hint chips only when no messages
+if not st.session_state.messages:
     st.markdown("""
-    <div style='padding:8px 0 16px;'>
-        <div style='display:flex;align-items:center;gap:8px;margin-bottom:4px;'>
-            <div style='width:10px;height:10px;border-radius:50%;background:#1D9E75;'></div>
-            <span style='font-size:15px;font-weight:600;color:#1a1a1a;'>Research Agent</span>
-        </div>
-        <div style='font-size:12px;color:#6b7c6b;'>Powered by Claude + Web Search</div>
+    <div style='text-align:center;margin:24px 0 8px;'>
+        <div style='font-size:12px;color:#9aaa9a;margin-bottom:10px;text-transform:uppercase;letter-spacing:0.5px;'>Try asking</div>
+        <span class='chip'>What's Sardine's ML stack?</span>
+        <span class='chip'>Who leads data at Plaid?</span>
+        <span class='chip'>Any new AI teams at Guidewire?</span>
+        <span class='chip'>Marqeta tech stack</span>
+        <span class='chip'>Majesco AI initiatives</span>
+    </div>
+    <div style='text-align:center;margin:16px 0;'>
+        <div style='font-size:12px;color:#9aaa9a;margin-bottom:10px;text-transform:uppercase;letter-spacing:0.5px;'>What I can research</div>
+        <span class='chip'>AI/ML stack</span>
+        <span class='chip'>Key people + LinkedIn</span>
+        <span class='chip'>Funding & news</span>
+        <span class='chip'>Hiring signals</span>
+        <span class='chip'>Blogs & talks</span>
     </div>
     """, unsafe_allow_html=True)
 
-    if st.button("+ New Research", use_container_width=True):
-        if st.session_state.messages:
-            first_msg = st.session_state.messages[0]["content"]
-            company = first_msg[:40] + "..." if len(first_msg) > 40 else first_msg
-            st.session_state.history = [company] + st.session_state.history[:4]
+# New research button
+if st.session_state.messages:
+    if st.button("+ New Research"):
         st.session_state.messages = []
         st.rerun()
 
-    st.markdown("---")
-    st.markdown("<div style='font-size:11px;color:#9aaa9a;letter-spacing:0.5px;text-transform:uppercase;margin-bottom:8px;'>What I can research</div>", unsafe_allow_html=True)
-    for item in ["AI/ML stack & initiatives", "Tech stack & tools", "Key people + LinkedIn", "Recent news & funding", "Hiring signals", "Blogs, talks & content"]:
-        st.markdown(f"<div style='font-size:12px;color:#4a6a4a;padding:3px 0;'>→ {item}</div>", unsafe_allow_html=True)
-
-    st.markdown("---")
-    st.markdown("<div style='font-size:11px;color:#9aaa9a;margin-bottom:6px;'>Try asking:</div>", unsafe_allow_html=True)
-    for q in ["What's Sardine's ML stack?", "Who leads data at Plaid?", "Any new AI teams at Guidewire?"]:
-        st.markdown(f"<div style='font-size:12px;color:#6b7c6b;font-style:italic;padding:2px 0;'>\"{q}\"</div>", unsafe_allow_html=True)
-
-    if st.session_state.history:
-        st.markdown("---")
-        st.markdown("<div style='font-size:11px;color:#9aaa9a;letter-spacing:0.5px;text-transform:uppercase;margin-bottom:8px;'>Recent</div>", unsafe_allow_html=True)
-        for item in st.session_state.history:
-            st.markdown(f"<div style='font-size:12px;color:#4a6a4a;padding:4px 0;border-bottom:1px solid #f0f0f0;'>🔍 {item}</div>", unsafe_allow_html=True)
-
-st.title("Company Research Agent")
-st.caption("Ask anything about a company — tech stack, team, AI initiatives, LinkedIn profiles, recent news.")
-
+# Chat history
 for msg in st.session_state.messages:
     with st.chat_message(msg["role"]):
         st.markdown(msg["content"])
@@ -125,15 +116,3 @@ if prompt := st.chat_input("Ask about a company..."):
                 result = f"Something went wrong: {e}"
         st.markdown(result)
     st.session_state.messages.append({"role": "assistant", "content": result})
-
-# Force sidebar open
-st.markdown("""
-<script>
-window.addEventListener('load', function() {
-    setTimeout(function() {
-        var btn = window.parent.document.querySelector('[data-testid="collapsedControl"]');
-        if (btn) btn.click();
-    }, 500);
-});
-</script>
-""", unsafe_allow_html=True)

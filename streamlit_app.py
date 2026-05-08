@@ -2,7 +2,12 @@ import os
 import streamlit as st
 from anthropic import Anthropic
 
-st.set_page_config(page_title="Company Research Agent", page_icon="🔍", layout="wide", initial_sidebar_state="expanded")
+st.set_page_config(
+    page_title="Company Research Agent",
+    page_icon="🔍",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
 
 client = Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
 
@@ -25,39 +30,36 @@ st.markdown("""
 html, body, [class*="css"] { font-family: 'Inter', sans-serif !important; }
 #MainMenu, footer, header { visibility: hidden; }
 .stApp { background-color: #f8faf8 !important; }
-section[data-testid="stSidebar"] { background-color: #ffffff !important; border-right: 1px solid #e8f0e8 !important; }
+section[data-testid="stSidebar"] {
+    background-color: #ffffff !important;
+    border-right: 1px solid #e8f0e8 !important;
+    min-width: 220px !important;
+    max-width: 280px !important;
+}
 section[data-testid="stSidebar"] * { color: #1a1a1a !important; }
-[data-testid="stChatMessage"] { background-color: #ffffff !important; border: 1px solid #e8f0e8 !important; border-radius: 12px !important; padding: 14px 18px !important; margin: 6px 0 !important; }
+[data-testid="stChatMessage"] {
+    background-color: #ffffff !important;
+    border: 1px solid #e8f0e8 !important;
+    border-radius: 12px !important;
+    padding: 14px 18px !important;
+    margin: 6px 0 !important;
+}
 [data-testid="stChatMessage"] p { color: #1a1a1a !important; font-size: 14px !important; line-height: 1.7 !important; }
-[data-testid="stChatMessage"] h1, [data-testid="stChatMessage"] h2, [data-testid="stChatMessage"] h3 { color: #1a1a1a !important; }
+[data-testid="stChatMessage"] h1,
+[data-testid="stChatMessage"] h2,
+[data-testid="stChatMessage"] h3 { color: #1a1a1a !important; }
 [data-testid="stChatMessage"] li { color: #1a1a1a !important; font-size: 14px !important; }
 [data-testid="stChatMessage"] code { background-color: #EAF3DE !important; color: #3B6D11 !important; padding: 2px 6px !important; border-radius: 4px !important; }
 .stChatInput textarea { background-color: #ffffff !important; color: #1a1a1a !important; border: 1px solid #c8e6c8 !important; border-radius: 12px !important; font-size: 14px !important; }
 .stButton button { background-color: #1D9E75 !important; color: white !important; border: none !important; border-radius: 8px !important; font-size: 13px !important; font-weight: 500 !important; }
-
-[data-testid="stChatMessageAvatarUser"] {
-    background-color: #1D9E75 !important;
-    color: white !important;
-}
-[data-testid="stChatMessageAvatarAssistant"] {
-    background-color: #EAF3DE !important;
-    color: #3B6D11 !important;
-}
-[data-testid="stChatMessageAvatarUser"] img,
-[data-testid="stChatMessageAvatarAssistant"] img {
-    display: none !important;
-}
-
-[data-testid="collapsedControl"] {
-    display: block !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-}
 </style>
 """, unsafe_allow_html=True)
 
 if "messages" not in st.session_state:
     st.session_state.messages = []
+
+if "history" not in st.session_state:
+    st.session_state.history = []
 
 with st.sidebar:
     st.markdown("""
@@ -69,33 +71,30 @@ with st.sidebar:
         <div style='font-size:12px;color:#6b7c6b;'>Powered by Claude + Web Search</div>
     </div>
     """, unsafe_allow_html=True)
+
     if st.button("+ New Research", use_container_width=True):
         if st.session_state.messages:
-            if "history" not in st.session_state:
-                st.session_state.history = []
-            # Extract company name from first user message
             first_msg = st.session_state.messages[0]["content"]
             company = first_msg[:40] + "..." if len(first_msg) > 40 else first_msg
             st.session_state.history = [company] + st.session_state.history[:4]
         st.session_state.messages = []
         st.rerun()
 
-    if "history" not in st.session_state:
-        st.session_state.history = []
+    st.markdown("---")
+    st.markdown("<div style='font-size:11px;color:#9aaa9a;letter-spacing:0.5px;text-transform:uppercase;margin-bottom:8px;'>What I can research</div>", unsafe_allow_html=True)
+    for item in ["AI/ML stack & initiatives", "Tech stack & tools", "Key people + LinkedIn", "Recent news & funding", "Hiring signals", "Blogs, talks & content"]:
+        st.markdown(f"<div style='font-size:12px;color:#4a6a4a;padding:3px 0;'>→ {item}</div>", unsafe_allow_html=True)
+
+    st.markdown("---")
+    st.markdown("<div style='font-size:11px;color:#9aaa9a;margin-bottom:6px;'>Try asking:</div>", unsafe_allow_html=True)
+    for q in ["What's Sardine's ML stack?", "Who leads data at Plaid?", "Any new AI teams at Guidewire?"]:
+        st.markdown(f"<div style='font-size:12px;color:#6b7c6b;font-style:italic;padding:2px 0;'>\"{q}\"</div>", unsafe_allow_html=True)
 
     if st.session_state.history:
         st.markdown("---")
         st.markdown("<div style='font-size:11px;color:#9aaa9a;letter-spacing:0.5px;text-transform:uppercase;margin-bottom:8px;'>Recent</div>", unsafe_allow_html=True)
         for item in st.session_state.history:
             st.markdown(f"<div style='font-size:12px;color:#4a6a4a;padding:4px 0;border-bottom:1px solid #f0f0f0;'>🔍 {item}</div>", unsafe_allow_html=True)
-    st.markdown("---")
-    st.markdown("<div style='font-size:11px;color:#9aaa9a;letter-spacing:0.5px;text-transform:uppercase;margin-bottom:8px;'>What I can research</div>", unsafe_allow_html=True)
-    for item in ["AI/ML stack & initiatives", "Tech stack & tools", "Key people + LinkedIn", "Recent news & funding", "Hiring signals", "Blogs, talks & content"]:
-        st.markdown(f"<div style='font-size:12px;color:#4a6a4a;padding:3px 0;'>→ {item}</div>", unsafe_allow_html=True)
-    st.markdown("---")
-    st.markdown("<div style='font-size:11px;color:#9aaa9a;margin-bottom:6px;'>Try asking:</div>", unsafe_allow_html=True)
-    for q in ["What's Sardine's ML stack?", "Who leads data at Plaid?", "Any new AI teams at Guidewire?"]:
-        st.markdown(f"<div style='font-size:12px;color:#6b7c6b;font-style:italic;padding:2px 0;'>\"{q}\"</div>", unsafe_allow_html=True)
 
 st.title("Company Research Agent")
 st.caption("Ask anything about a company — tech stack, team, AI initiatives, LinkedIn profiles, recent news.")

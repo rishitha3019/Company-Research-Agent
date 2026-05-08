@@ -125,3 +125,15 @@ if prompt := st.chat_input("Ask about a company..."):
                 result = f"Something went wrong: {e}"
         st.markdown(result)
     st.session_state.messages.append({"role": "assistant", "content": result})
+
+# Force sidebar open
+st.markdown("""
+<script>
+window.addEventListener('load', function() {
+    setTimeout(function() {
+        var btn = window.parent.document.querySelector('[data-testid="collapsedControl"]');
+        if (btn) btn.click();
+    }, 500);
+});
+</script>
+""", unsafe_allow_html=True)
